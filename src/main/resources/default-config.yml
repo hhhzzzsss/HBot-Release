@@ -1,0 +1,10 @@
+bots:
+  - host: "play.kaboom.pw"
+    port: 25565
+    serverNick: "Kaboom"
+    discordToken: "Discord bot token goes here"
+    categoryName: "Main Kaboom Channels"
+
+trustedKey: ""
+adminKey: ""
+ownerKey: ""
