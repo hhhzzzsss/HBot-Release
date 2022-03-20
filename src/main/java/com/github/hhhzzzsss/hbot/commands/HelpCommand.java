@@ -6,12 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.github.hhhzzzsss.hbot.Bot;
-import com.github.hhhzzzsss.hbot.command.ChatCommand;
-import com.github.hhhzzzsss.hbot.command.Command;
-import com.github.hhhzzzsss.hbot.command.CommandException;
-import com.github.hhhzzzsss.hbot.command.CommandList;
-import com.github.hhhzzzsss.hbot.command.DiscordCommand;
-import com.github.hhhzzzsss.hbot.command.Permission;
+import com.github.hhhzzzsss.hbot.command.*;
 import com.github.hhhzzzsss.hbot.commandcore.CommandCore;
 import com.github.hhhzzzsss.hbot.discord.DiscordManager;
 import com.github.hhhzzzsss.hbot.modules.ChatCommandHandler;
@@ -21,7 +16,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 @RequiredArgsConstructor
-public class HelpCommand implements ChatCommand, DiscordCommand {
+public class HelpCommand implements ChatCommand, GlobalDiscordCommand {
 	public final Bot bot;
 	public final CommandList commandList;
 	public final ChatCommandHandler commandHandler;
@@ -65,7 +60,7 @@ public class HelpCommand implements ChatCommand, DiscordCommand {
 	}
 	
 	@Override
-	public void executeChat(String sender, String args) throws CommandException {
+	public void executeChat(ChatSender sender, String args) throws CommandException {
 		String prefix = commandHandler.getPrefix();
 		if (args.length() == 0) { // List commands
 			StringBuilder sb = new StringBuilder();

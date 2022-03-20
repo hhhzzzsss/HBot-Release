@@ -1,61 +1,81 @@
 package com.github.hhhzzzsss.hbot.block;
 
+import com.github.hhhzzzsss.hbot.listeners.DisconnectListener;
+import com.github.hhhzzzsss.hbot.listeners.PacketListener;
+import com.github.steveice10.mc.protocol.data.game.entity.metadata.Position;
+import com.github.steveice10.mc.protocol.data.game.level.block.BlockChangeEntry;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundLoginPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundRespawnPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.level.ClientboundBlockUpdatePacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.level.ClientboundForgetLevelChunkPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.level.ClientboundLevelChunkWithLightPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.level.ClientboundSectionBlocksUpdatePacket;
+import com.github.steveice10.opennbt.conversion.builtin.IntTagConverter;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntTag;
+import com.github.steveice10.packetlib.event.session.DisconnectedEvent;
+import com.github.steveice10.packetlib.packet.Packet;
+import lombok.Getter;
+
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 
-import com.github.hhhzzzsss.hbot.listeners.DisconnectListener;
-import com.github.hhhzzzsss.hbot.listeners.PacketListener;
-import com.github.hhhzzzsss.hbot.util.BlockUtils;
-import com.github.steveice10.mc.protocol.data.game.chunk.Column;
-import com.github.steveice10.mc.protocol.data.game.entity.metadata.Position;
-import com.github.steveice10.mc.protocol.data.game.world.block.BlockChangeRecord;
-import com.github.steveice10.mc.protocol.packet.ingame.server.world.ServerBlockChangePacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.world.ServerMultiBlockChangePacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.world.ServerUnloadChunkPacket;
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.IntTag;
-import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import com.github.steveice10.packetlib.event.session.DisconnectedEvent;
-import com.github.steveice10.packetlib.packet.Packet;
-
 public class World implements PacketListener, DisconnectListener {
-	
+
 	public HashMap<ChunkPos, ChunkColumn> chunks = new HashMap<>();
+	@Getter private int height = 256;
+	@Getter private int minY = 0;
 	
 	@Override
 	public void onPacket(Packet packet) {
-		if (packet instanceof ServerChunkDataPacket) {
-			ServerChunkDataPacket t_packet = (ServerChunkDataPacket) packet;
-			Column column = t_packet.getColumn();
-			ChunkPos pos = new ChunkPos(column.getX(), column.getZ());
-			
-			if (!chunks.containsKey(pos) || column.getBiomeData() != null) {
-				ChunkColumn chunk = new ChunkColumn(pos);
-				chunk.loadColumn(column);
-				chunks.put(pos, chunk);
+		if (packet instanceof ClientboundLoginPacket) {
+			ClientboundLoginPacket t_packet = (ClientboundLoginPacket) packet;
+			CompoundTag dimensionEntry = t_packet.getDimension();
+			height = ((IntTag)dimensionEntry.get("height")).getValue();
+			minY = ((IntTag)dimensionEntry.get("min_y")).getValue();
+		} else if (packet instanceof ClientboundRespawnPacket) {
+			ClientboundRespawnPacket t_packet = (ClientboundRespawnPacket) packet;
+			CompoundTag dimensionEntry = t_packet.getDimension();
+			height = ((IntTag)dimensionEntry.get("height")).getValue();
+			minY = ((IntTag)dimensionEntry.get("min_y")).getValue();
+			chunks.clear();
+		} if (packet instanceof ClientboundLevelChunkWithLightPacket) {
+			ClientboundLevelChunkWithLightPacket t_packet = (ClientboundLevelChunkWithLightPacket) packet;
+			ChunkPos pos = new ChunkPos(t_packet.getX(), t_packet.getZ());
+			ChunkColumn column;
+			try {
+				column = new ChunkColumn(pos, t_packet.getChunkData(), height, minY);
+			} catch (IOException e) {
+				return;
 			}
-			else {
-				ChunkColumn chunk = chunks.get(pos);
-				chunk.loadColumn(column);
-			}
+			chunks.put(pos, column);
+//			if (!chunks.containsKey(pos) || column.getBiomeData() != null) {
+//				ChunkColumn chunk = new ChunkColumn(pos);
+//				chunk.loadColumn(column);
+//				chunks.put(pos, chunk);
+//			}
+//			else {
+//				ChunkColumn chunk = chunks.get(pos);
+//				chunk.loadColumn(column);
+//			}
 		}
-		else if (packet instanceof ServerBlockChangePacket) {
-			ServerBlockChangePacket t_packet = (ServerBlockChangePacket) packet;
-			Position pos = t_packet.getRecord().getPosition();
-			int id = t_packet.getRecord().getBlock();
+		else if (packet instanceof ClientboundBlockUpdatePacket) {
+			ClientboundBlockUpdatePacket t_packet = (ClientboundBlockUpdatePacket) packet;
+			Position pos = t_packet.getEntry().getPosition();
+			int id = t_packet.getEntry().getBlock();
 			setBlock(pos.getX(), pos.getY(), pos.getZ(), id);
 		}
-		else if (packet instanceof ServerMultiBlockChangePacket) {
-			ServerMultiBlockChangePacket t_packet = (ServerMultiBlockChangePacket) packet;
-			for (BlockChangeRecord bcr : t_packet.getRecords()) {
+		else if (packet instanceof ClientboundSectionBlocksUpdatePacket) {
+			ClientboundSectionBlocksUpdatePacket t_packet = (ClientboundSectionBlocksUpdatePacket) packet;
+			for (BlockChangeEntry bcr : t_packet.getEntries()) {
 				Position pos = bcr.getPosition();
 				int id = bcr.getBlock();
 				setBlock(pos.getX(), pos.getY(), pos.getZ(), id);
 			}
 		}
-		else if (packet instanceof ServerUnloadChunkPacket) {
-			ServerUnloadChunkPacket t_packet = (ServerUnloadChunkPacket) packet;
+		else if (packet instanceof ClientboundForgetLevelChunkPacket) {
+			ClientboundForgetLevelChunkPacket t_packet = (ClientboundForgetLevelChunkPacket) packet;
 			chunks.remove(new ChunkPos(t_packet.getX(), t_packet.getZ()));
 		}
 	}

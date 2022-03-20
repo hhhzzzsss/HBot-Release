@@ -1,11 +1,7 @@
 package com.github.hhhzzzsss.hbot.commands;
 
 import com.github.hhhzzzsss.hbot.HBot;
-import com.github.hhhzzzsss.hbot.command.ArgsParser;
-import com.github.hhhzzzsss.hbot.command.ChatCommand;
-import com.github.hhhzzzsss.hbot.command.CommandException;
-import com.github.hhhzzzsss.hbot.command.DiscordCommand;
-import com.github.hhhzzzsss.hbot.command.PlatformInfo;
+import com.github.hhhzzzsss.hbot.command.*;
 import com.github.hhhzzzsss.hbot.util.BlockUtils;
 
 import lombok.*;
@@ -38,13 +34,13 @@ public class DebugCommand implements ChatCommand, DiscordCommand {
 	}
 
 	@Override
-	public void executeChat(String sender, String args) throws CommandException {
+	public void executeChat(ChatSender sender, String args) throws CommandException {
 		execute(args, PlatformInfo.getMinecraft(hbot, hbot.getCommandCore()));
 	}
 	
 	@Override
 	public void executeDiscord(MessageReceivedEvent event, String args) throws CommandException {
-		execute(args, PlatformInfo.getDiscord(hbot, event, "Command Loop"));
+		execute(args, PlatformInfo.getDiscord(hbot, event, "Debug"));
 	}
 	
 	private void execute(String args, PlatformInfo platform) throws CommandException {

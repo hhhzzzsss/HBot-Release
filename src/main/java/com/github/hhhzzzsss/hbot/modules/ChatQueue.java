@@ -1,15 +1,16 @@
 package com.github.hhhzzzsss.hbot.modules;
 
+import com.github.hhhzzzsss.hbot.Bot;
+import com.github.hhhzzzsss.hbot.listeners.TickListener;
+import com.github.steveice10.mc.protocol.packet.ingame.serverbound.ServerboundChatPacket;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.github.hhhzzzsss.hbot.Bot;
-import com.github.hhhzzzsss.hbot.listeners.TickListener;
-import com.github.steveice10.mc.protocol.packet.ingame.client.ClientChatPacket;
-
-import lombok.*;
 
 @RequiredArgsConstructor
 public class ChatQueue implements TickListener {
@@ -32,12 +33,12 @@ public class ChatQueue implements TickListener {
 		long currentTime = System.currentTimeMillis();
 		if (currentTime >= nextChatTime) {
 			if (commandQueue.size() > 0 && currentTime >= nextCommandTime) {
-				bot.sendPacket(new ClientChatPacket(commandQueue.poll()));
+				bot.sendPacket(new ServerboundChatPacket(commandQueue.poll()));
 				nextChatTime = currentTime + chatDelay;
 				nextCommandTime = currentTime + commandDelay;
 			}
 			else if (chatQueue.size() > 0) {
-				bot.sendPacket(new ClientChatPacket(chatQueue.poll()));
+				bot.sendPacket(new ServerboundChatPacket(chatQueue.poll()));
 				nextChatTime = currentTime + chatDelay;
 			}
 		}

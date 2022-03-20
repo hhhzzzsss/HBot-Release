@@ -1,10 +1,7 @@
 package com.github.hhhzzzsss.hbot.commands;
 
 import com.github.hhhzzzsss.hbot.HBot;
-import com.github.hhhzzzsss.hbot.command.ChatCommand;
-import com.github.hhhzzzsss.hbot.command.CommandException;
-import com.github.hhhzzzsss.hbot.command.DiscordCommand;
-import com.github.hhhzzzsss.hbot.command.PlatformInfo;
+import com.github.hhhzzzsss.hbot.command.*;
 
 import lombok.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -34,7 +31,7 @@ public class CreatorCommand implements ChatCommand, DiscordCommand {
 	}
 
 	@Override
-	public void executeChat(String sender, String args) throws CommandException {
+	public void executeChat(ChatSender sender, String args) throws CommandException {
 		execute(PlatformInfo.getMinecraft(hbot));
 	}
 	

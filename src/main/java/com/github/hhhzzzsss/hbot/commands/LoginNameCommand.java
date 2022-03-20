@@ -3,11 +3,7 @@ package com.github.hhhzzzsss.hbot.commands;
 import java.util.UUID;
 
 import com.github.hhhzzzsss.hbot.HBot;
-import com.github.hhhzzzsss.hbot.command.ArgsParser;
-import com.github.hhhzzzsss.hbot.command.ChatCommand;
-import com.github.hhhzzzsss.hbot.command.CommandException;
-import com.github.hhhzzzsss.hbot.command.DiscordCommand;
-import com.github.hhhzzzsss.hbot.command.PlatformInfo;
+import com.github.hhhzzzsss.hbot.command.*;
 
 import lombok.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -37,7 +33,7 @@ public class LoginNameCommand implements ChatCommand, DiscordCommand {
 	}
 
 	@Override
-	public void executeChat(String sender, String args) throws CommandException {
+	public void executeChat(ChatSender sender, String args) throws CommandException {
 		PlatformInfo platform = PlatformInfo.getMinecraft(hbot);
 		ArgsParser parser = new ArgsParser(this, args);
 		String player = parser.readString(false);
@@ -46,9 +42,13 @@ public class LoginNameCommand implements ChatCommand, DiscordCommand {
 			uuid = UUID.fromString(player);
 		}
 		catch(IllegalArgumentException|NullPointerException e) {
-			if (player == null) player = sender;
-			player = player.replaceAll("(?<!\\\\)%", "§").replace("\\%", "%");
-			uuid = hbot.getPlayerListTracker().getRecordedUUID(player);
+			if (player == null) {
+				player = sender.getDisplayName();
+				uuid = sender.getUuid();
+			} else {
+				player = player.replaceAll("(?<!\\\\)%", "§").replace("\\%", "%");
+				uuid = hbot.getPlayerListTracker().getRecordedUUID(player);
+			}
 		}
 		String loginName = uuid == null ? null : hbot.getPlayerListTracker().getRecordedLoginName(uuid);
 		if (loginName == null) {

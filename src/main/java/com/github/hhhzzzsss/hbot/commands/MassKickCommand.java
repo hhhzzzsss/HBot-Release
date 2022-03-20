@@ -6,21 +6,16 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.github.hhhzzzsss.hbot.Bot;
-import com.github.hhhzzzsss.hbot.command.ArgsParser;
-import com.github.hhhzzzsss.hbot.command.CommandException;
-import com.github.hhhzzzsss.hbot.command.DiscordCommand;
-import com.github.hhhzzzsss.hbot.command.PlatformInfo;
+import com.github.hhhzzzsss.hbot.command.*;
 
 import lombok.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.RestAction;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
 @RequiredArgsConstructor
-public class MassKickCommand implements DiscordCommand {
+public class MassKickCommand implements GlobalDiscordCommand {
 	private final Bot bot;
 
 	@Override

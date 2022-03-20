@@ -1,19 +1,18 @@
 package com.github.hhhzzzsss.hbot.modules;
 
-import java.util.HashMap;
-import java.util.UUID;
-
 import com.github.hhhzzzsss.hbot.entity.PlayerData;
 import com.github.hhhzzzsss.hbot.listeners.DisconnectListener;
 import com.github.hhhzzzsss.hbot.listeners.PacketListener;
 import com.github.hhhzzzsss.hbot.util.HashUtils;
 import com.github.steveice10.mc.protocol.data.game.PlayerListEntry;
 import com.github.steveice10.mc.protocol.data.game.PlayerListEntryAction;
-import com.github.steveice10.mc.protocol.packet.ingame.server.ServerPlayerListEntryPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundPlayerInfoPacket;
 import com.github.steveice10.packetlib.event.session.DisconnectedEvent;
 import com.github.steveice10.packetlib.packet.Packet;
+import lombok.Getter;
 
-import lombok.*;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class PlayerListTracker implements PacketListener, DisconnectListener {
 	
@@ -36,8 +35,8 @@ public class PlayerListTracker implements PacketListener, DisconnectListener {
 
 	@Override
 	public void onPacket(Packet packet) {
-		if (packet instanceof ServerPlayerListEntryPacket) {
-			ServerPlayerListEntryPacket t_packet = (ServerPlayerListEntryPacket) packet;
+		if (packet instanceof ClientboundPlayerInfoPacket) {
+			ClientboundPlayerInfoPacket t_packet = (ClientboundPlayerInfoPacket) packet;
 			for (PlayerListEntry entry : t_packet.getEntries()) {
         		UUID uuid = entry.getProfile().getId();
 				if (t_packet.getAction() == PlayerListEntryAction.ADD_PLAYER) {

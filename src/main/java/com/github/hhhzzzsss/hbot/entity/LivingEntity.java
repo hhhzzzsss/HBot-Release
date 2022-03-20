@@ -1,10 +1,10 @@
 package com.github.hhhzzzsss.hbot.entity;
 
-import com.github.steveice10.mc.protocol.data.game.entity.EntityStatus;
-import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityHeadLookPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityStatusPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnLivingEntityPacket;
-import lombok.*;
+import com.github.steveice10.mc.protocol.data.game.entity.EntityEvent;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.entity.ClientboundEntityEventPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.entity.ClientboundRotateHeadPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.entity.spawn.ClientboundAddMobPacket;
+import lombok.Getter;
 
 @Getter
 public class LivingEntity extends Entity {
@@ -13,7 +13,7 @@ public class LivingEntity extends Entity {
 	
 	protected LivingEntity() {}
 	
-	public LivingEntity(ServerSpawnLivingEntityPacket p) {
+	public LivingEntity(ClientboundAddMobPacket p) {
 		type = p.getType();
 		eid = p.getEntityId();
 		uuid = p.getUuid();
@@ -28,12 +28,12 @@ public class LivingEntity extends Entity {
 		zVel = p.getMotionZ();
 	}
 	
-	public void update(ServerEntityHeadLookPacket p) {
+	public void update(ClientboundRotateHeadPacket p) {
 		headYaw = p.getHeadYaw();
 	}
 	
-	public void update(ServerEntityStatusPacket p) {
-		if (p.getStatus() == EntityStatus.LIVING_DEATH) {
+	public void update(ClientboundEntityEventPacket p) {
+		if (p.getStatus() == EntityEvent.LIVING_DEATH) {
 			alive = false;
 		}
 	}

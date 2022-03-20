@@ -17,13 +17,14 @@ public class Config {
     static final File file = new File("config.yml");
     @Getter static Config config;
 
-    @Data
+    @Getter
     public static class BotInfo {
-        String host;
-        int port;
-        String serverNick;
-        String discordToken;
-        String categoryName;
+        public String host;
+        public int port;
+        public String serverNick;
+        public String discordToken;
+        public String categoryName;
+        public boolean isDefault;
     }
 
     ArrayList<BotInfo> bots;

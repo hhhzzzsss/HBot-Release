@@ -1,13 +1,11 @@
 package com.github.hhhzzzsss.hbot.commands;
 
 import com.github.hhhzzzsss.hbot.HBot;
-import com.github.hhhzzzsss.hbot.command.ArgsParser;
-import com.github.hhhzzzsss.hbot.command.ChatCommand;
-import com.github.hhhzzzsss.hbot.command.CommandException;
-import com.github.hhhzzzsss.hbot.command.DiscordCommand;
-import com.github.hhhzzzsss.hbot.command.PlatformInfo;
+import com.github.hhhzzzsss.hbot.command.*;
 import lombok.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.util.UUID;
 
 @RequiredArgsConstructor
 public class LockCommand implements ChatCommand, DiscordCommand {
@@ -35,11 +33,11 @@ public class LockCommand implements ChatCommand, DiscordCommand {
 
 	@Override
 	public int getPermission() {
-		return 2;
+		return 1;
 	}
 
 	@Override
-	public void executeChat(String sender, String args) throws CommandException {
+	public void executeChat(ChatSender sender, String args) throws CommandException {
 		ArgsParser parser = new ArgsParser(this, args);
 		execute(parser, PlatformInfo.getMinecraft(hbot));
 	}
@@ -54,11 +52,25 @@ public class LockCommand implements ChatCommand, DiscordCommand {
 		String subCommand = parser.readWord(true);
 		if (subCommand.equalsIgnoreCase("add")) {
 			String username = parser.readString(true).replaceAll("(?<!\\\\)%", "§").replace("\\%", "%");
+			try {
+				UUID uuid = UUID.fromString(username);
+				username = hbot.getPlayerListTracker().getRecordedLoginName(uuid);
+				if (username == null) {
+					throw new CommandException("UUID was not found in cache");
+				}
+			} catch (IllegalArgumentException e) {}
 			hbot.getLockManager().add(username);
 			platform.sendMessage("&7Added &3" + username + " &7to the lock list");
 		}
 		else if (subCommand.equalsIgnoreCase("remove")) {
 			String username = parser.readString(true).replaceAll("(?<!\\\\)%", "§").replace("\\%", "%");
+			try {
+				UUID uuid = UUID.fromString(username);
+				username = hbot.getPlayerListTracker().getRecordedLoginName(uuid);
+				if (username == null) {
+					throw new CommandException("UUID was not found in cache");
+				}
+			} catch (IllegalArgumentException e) {}
 			hbot.getLockManager().remove(username);
 			platform.sendMessage("&7Removed &3" + username + " &7from the lock list");
 		}

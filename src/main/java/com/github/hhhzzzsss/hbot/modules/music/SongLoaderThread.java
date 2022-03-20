@@ -22,7 +22,7 @@ public class SongLoaderThread extends Thread {
 	
 	boolean isUrl = false;
 	
-	public SongLoaderThread(String location) throws IOException, InvalidMidiDataException {
+	public SongLoaderThread(String location) throws IOException {
 		this.location = location;
 		if (location.startsWith("http://") || location.startsWith("https://")) {
 			isUrl = true;

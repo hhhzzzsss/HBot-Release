@@ -2,6 +2,7 @@ package com.github.hhhzzzsss.hbot.commands;
 
 import com.github.hhhzzzsss.hbot.Bot;
 import com.github.hhhzzzsss.hbot.command.ChatCommand;
+import com.github.hhhzzzsss.hbot.command.ChatSender;
 import com.github.hhhzzzsss.hbot.command.CommandException;
 
 import lombok.*;
@@ -31,7 +32,7 @@ public class ValidateCommand implements ChatCommand {
 	}
 
 	@Override
-	public void executeChat(String sender, String args) throws CommandException {
+	public void executeChat(ChatSender sender, String args) throws CommandException {
 		bot.sendChat("&aValid Hash");
 	}
 }

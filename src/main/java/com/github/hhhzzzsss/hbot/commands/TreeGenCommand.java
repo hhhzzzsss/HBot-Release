@@ -3,11 +3,7 @@ package com.github.hhhzzzsss.hbot.commands;
 import java.util.List;
 
 import com.github.hhhzzzsss.hbot.HBot;
-import com.github.hhhzzzsss.hbot.command.ArgsParser;
-import com.github.hhhzzzsss.hbot.command.ChatCommand;
-import com.github.hhhzzzsss.hbot.command.CommandException;
-import com.github.hhhzzzsss.hbot.command.DiscordCommand;
-import com.github.hhhzzzsss.hbot.command.PlatformInfo;
+import com.github.hhhzzzsss.hbot.command.*;
 import com.github.hhhzzzsss.hbot.processes.treegen.TreeGenProcess;
 import com.github.hhhzzzsss.hbot.processes.treegen.TreeType;
 
@@ -49,7 +45,7 @@ public class TreeGenCommand implements ChatCommand, DiscordCommand {
 	}
 
 	@Override
-	public void executeChat(String sender, String args) throws CommandException {
+	public void executeChat(ChatSender sender, String args) throws CommandException {
 		execute(args, PlatformInfo.getMinecraft(hbot));
 	}
 	

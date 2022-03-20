@@ -1,16 +1,11 @@
 package com.github.hhhzzzsss.hbot.commands;
 
-import java.awt.Color;
 import java.io.File;
 import java.util.List;
 
 import com.github.hhhzzzsss.hbot.HBot;
-import com.github.hhhzzzsss.hbot.command.ArgsParser;
-import com.github.hhhzzzsss.hbot.command.ChatCommand;
-import com.github.hhhzzzsss.hbot.command.CommandException;
-import com.github.hhhzzzsss.hbot.command.DiscordCommand;
-import com.github.hhhzzzsss.hbot.command.PlatformInfo;
-import com.github.hhhzzzsss.hbot.processes.SchemProcess;
+import com.github.hhhzzzsss.hbot.command.*;
+import com.github.hhhzzzsss.hbot.processes.schem.SchemProcess;
 
 import lombok.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -28,6 +23,7 @@ public class SchemCommand implements ChatCommand, DiscordCommand {
 	public String[] getSyntax() {
 		return new String[] {
 			"list",
+			"stop",
 			"build [flags] <x> <y> <z> <filename>",
 			"build -hcentered ... - horizontally centered",
 			"build -vcentered ... - vertically centered",
@@ -43,11 +39,11 @@ public class SchemCommand implements ChatCommand, DiscordCommand {
 
 	@Override
 	public int getPermission() {
-		return 1;
+		return 0;
 	}
 
 	@Override
-	public void executeChat(String sender, String args) throws CommandException {
+	public void executeChat(ChatSender sender, String args) throws CommandException {
 		ArgsParser parser = new ArgsParser(this, args);
 		execute(parser, PlatformInfo.getMinecraft(hbot, hbot.getCommandCore()));
 	}
@@ -61,7 +57,7 @@ public class SchemCommand implements ChatCommand, DiscordCommand {
 	private void execute(ArgsParser parser, PlatformInfo platform) throws CommandException {
 		String subCommand = parser.readWord(true);
 		
-		if (subCommand.equals("list")) {
+		if (subCommand.equalsIgnoreCase("list")) {
     		int color = 0;
     		StringBuilder sb = new StringBuilder("&7Schematics -");
     		for (File schemFile : SchemProcess.SCHEM_DIR.listFiles()) {
@@ -74,14 +70,23 @@ public class SchemCommand implements ChatCommand, DiscordCommand {
     		}
 			platform.sendMessage(sb.toString());
 		}
-		if (subCommand.equals("build")) {
+		else if (subCommand.equalsIgnoreCase("stop")) {
+			if (hbot.getCommandCore().getProcess() instanceof SchemProcess) {
+				hbot.getCommandCore().getProcess().stop();
+				platform.sendMessage("&7Schematic build canceled");
+			}
+			else {
+				platform.sendMessage("&7No schematic is being built");
+			}
+		}
+		else if (subCommand.equalsIgnoreCase("build")) {
 			List<String> flags = parser.readFlags();
 			int x = parser.readInt(true);
 			int y = parser.readInt(true);
 			int z = parser.readInt(true);
 			String filename = parser.readString(true);
-			hbot.getCommandCore().setProcess(new SchemProcess(hbot, x, y, z, filename, flags));
-			platform.sendMessage("&7Now building &3" + filename);
+			hbot.getCommandCore().setProcess(new SchemProcess(hbot, platform, x, y, z, filename, flags));
+			platform.sendMessage("&7Loading &3" + filename + "&7...");
 		}
 	}
 }

@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import com.github.hhhzzzsss.hbot.HBot;
 import com.github.hhhzzzsss.hbot.command.ChatCommand;
+import com.github.hhhzzzsss.hbot.command.ChatSender;
 import com.github.hhhzzzsss.hbot.command.CommandException;
 import lombok.*;
 
@@ -32,14 +33,10 @@ public class RtpCommand implements ChatCommand {
 	}
 
 	@Override
-	public void executeChat(String sender, String args) throws CommandException {
-		UUID uuid = hbot.getPlayerListTracker().getRecordedUUID(sender);
-		if (uuid == null) {
-			throw new CommandException("Could not find player " + sender);
-		}
+	public void executeChat(ChatSender sender, String args) throws CommandException {
 		int x = (int)((Math.random()*2.-1.) * 1000000);
 		int z = (int)((Math.random()*2.-1.) * 1000000);
-		hbot.getCommandCore().run(String.format("tp %s %d 100 %d", uuid.toString(), x, z));
-		hbot.sendCommand(String.format("&7Teleporting &3%s &7to &3%d 100 %d", sender, x, z));
+		hbot.getCommandCore().run(String.format("tp %s %d 100 %d", sender.getUuid().toString(), x, z));
+		hbot.sendCommand(String.format("&7Teleporting &3%s &7to &3%d 100 %d", sender.getName(), x, z));
 	}
 }

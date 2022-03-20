@@ -3,11 +3,7 @@ package com.github.hhhzzzsss.hbot.commands;
 import java.util.UUID;
 
 import com.github.hhhzzzsss.hbot.HBot;
-import com.github.hhhzzzsss.hbot.command.ArgsParser;
-import com.github.hhhzzzsss.hbot.command.ChatCommand;
-import com.github.hhhzzzsss.hbot.command.CommandException;
-import com.github.hhhzzzsss.hbot.command.DiscordCommand;
-import com.github.hhhzzzsss.hbot.command.PlatformInfo;
+import com.github.hhhzzzsss.hbot.command.*;
 
 import lombok.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -37,12 +33,15 @@ public class UUIDCommand implements ChatCommand, DiscordCommand {
 	}
 
 	@Override
-	public void executeChat(String sender, String args) throws CommandException {
+	public void executeChat(ChatSender sender, String args) throws CommandException {
 		PlatformInfo platform = PlatformInfo.getMinecraft(hbot);
 		ArgsParser parser = new ArgsParser(this, args);
 		String username = parser.readString(false);
-		if (username == null) username = sender;
-		else username = username.replaceAll("(?<!\\\\)%", "§").replace("\\%", "%");
+		if (username == null) {
+			platform.sendMessage("&7Your UUID is &3" + sender.getUuid().toString());
+			return;
+		}
+		username = username.replaceAll("(?<!\\\\)%", "§").replace("\\%", "%");
 		UUID uuid = hbot.getPlayerListTracker().getRecordedUUID(username);
 		if (uuid == null) {
 			throw new CommandException("Could not get uuid of " + username.replace("§", "&"));

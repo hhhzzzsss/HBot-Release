@@ -8,6 +8,7 @@ import java.util.Queue;
 import javax.sound.midi.InvalidMidiDataException;
 
 import com.github.hhhzzzsss.hbot.HBot;
+import com.github.hhhzzzsss.hbot.command.CommandException;
 import com.github.hhhzzzsss.hbot.command.PlatformInfo;
 import com.github.hhhzzzsss.hbot.listeners.TickListener;
 
@@ -34,11 +35,14 @@ public class MusicPlayer implements TickListener {
 	 * @throws IOException
 	 * @throws InvalidMidiDataException
 	 */
-	public void play(String location, PlatformInfo platform) throws IOException, InvalidMidiDataException {
+	public void play(String location, PlatformInfo platform) throws IOException, InvalidMidiDataException, CommandException {
 		SongLoaderThread loaderThread = new SongLoaderThread(location); 
 		if (noActiveSong()) {
 			loadSong(loaderThread);
 			platform.sendDiscordOnlyMessage("Playing `" + location + "`");
+		}
+		else if (songQueue.size() >= 100) {
+			throw new CommandException("Cannot exceed max queue length of 100");
 		}
 		else {
 			platform.sendMessage("&6Added &3" + location + " &6to the song queue");

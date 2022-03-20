@@ -5,12 +5,12 @@ import com.github.hhhzzzsss.hbot.Logger;
 import com.github.hhhzzzsss.hbot.listeners.DisconnectListener;
 import com.github.hhhzzzsss.hbot.listeners.PacketListener;
 import com.github.hhhzzzsss.hbot.util.ChatUtils;
-import com.github.steveice10.mc.protocol.packet.ingame.server.ServerChatPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundChatPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundLoginPacket;
 import com.github.steveice10.packetlib.event.session.DisconnectedEvent;
 import com.github.steveice10.packetlib.packet.Packet;
-
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 public class ChatLogger implements PacketListener, DisconnectListener {
 	private final HBot hbot;
@@ -23,11 +23,11 @@ public class ChatLogger implements PacketListener, DisconnectListener {
 
 	@Override
 	public void onPacket(Packet packet) {
-		if (packet instanceof ServerJoinGamePacket) {
+		if (packet instanceof ClientboundLoginPacket) {
 			log(String.format("Successfully logged in to %s:%d", hbot.getHost(), hbot.getPort()));
 		}
-		else if (packet instanceof ServerChatPacket) {
-			ServerChatPacket t_packet = (ServerChatPacket) packet;
+		else if (packet instanceof ClientboundChatPacket) {
+			ClientboundChatPacket t_packet = (ClientboundChatPacket) packet;
 			String fullText = ChatUtils.getFullText(t_packet.getMessage());
 			if (fullText.equals("") || fullText.startsWith("Command set: ") || fullText.matches("[\u2800-\u28FF\\s]+") || fullText.matches("[⬛\\s]{60,}")) {
 				return;

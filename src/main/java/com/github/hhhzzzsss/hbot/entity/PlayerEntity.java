@@ -1,10 +1,10 @@
 package com.github.hhhzzzsss.hbot.entity;
 
 import com.github.steveice10.mc.protocol.data.game.entity.type.EntityType;
-import com.github.steveice10.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.entity.spawn.ClientboundAddPlayerPacket;
 
 public class PlayerEntity extends LivingEntity {
-	public PlayerEntity(ServerSpawnPlayerPacket p) {
+	public PlayerEntity(ClientboundAddPlayerPacket p) {
 		type = EntityType.PLAYER;
 		eid = p.getEntityId();
 		uuid = p.getUuid();

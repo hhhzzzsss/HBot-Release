@@ -9,16 +9,17 @@ import com.github.hhhzzzsss.hbot.listeners.PacketListener;
 import com.github.hhhzzzsss.hbot.listeners.TickListener;
 import com.github.hhhzzzsss.hbot.util.BlockUtils;
 import com.github.steveice10.mc.protocol.data.game.chunk.BitStorage;
-import com.github.steveice10.mc.protocol.data.game.chunk.Chunk;
+import com.github.steveice10.mc.protocol.data.game.chunk.ChunkSection;
 import com.github.steveice10.mc.protocol.data.game.chunk.palette.Palette;
 import com.github.steveice10.mc.protocol.data.game.entity.metadata.Position;
-import com.github.steveice10.mc.protocol.data.game.world.block.CommandBlockMode;
-import com.github.steveice10.mc.protocol.packet.ingame.client.window.ClientUpdateCommandBlockPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.ServerChatPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
+import com.github.steveice10.mc.protocol.data.game.level.block.CommandBlockMode;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundChatPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundLoginPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.serverbound.inventory.ServerboundSetCommandBlockPacket;
 import com.github.steveice10.packetlib.packet.Packet;
-
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import net.kyori.adventure.text.TranslatableComponent;
 
 @RequiredArgsConstructor
@@ -37,6 +38,7 @@ public class CommandCore implements TickListener, PacketListener {
 	@Getter private CoreProcess process = null;
 	
 	private int coreCheckCooldown = 20;
+	boolean retry = false;
 	
 	@Override
 	public void onTick() {
@@ -59,9 +61,11 @@ public class CommandCore implements TickListener, PacketListener {
 						corePos = relocatePos;
 						relocatePos = null;
 					}
+					retry = false;
 				}
 				else {
-					fillCore(trackedPos);
+					fillCore(trackedPos, retry);
+					retry = true;
 					coreCheckCooldown = 30; // delay 30 ticks if it's filling the core
 				}
 			}
@@ -86,11 +90,11 @@ public class CommandCore implements TickListener, PacketListener {
 	
 	@Getter @Setter private int commandLag = 0;
 	public void onPacket(Packet packet) {
-		if (packet instanceof ServerJoinGamePacket) {
+		if (packet instanceof ClientboundLoginPacket) {
 			bot.sendCommand("/gamerule commandBlockOutput false");
 		}
-		else if (packet instanceof ServerChatPacket) {
-			ServerChatPacket t_packet = (ServerChatPacket) packet;
+		else if (packet instanceof ClientboundChatPacket) {
+			ClientboundChatPacket t_packet = (ClientboundChatPacket) packet;
 			if (t_packet.getMessage() instanceof TranslatableComponent) {
 				TranslatableComponent message = (TranslatableComponent) t_packet.getMessage();
 				if (message.key().equals("advMode.setCommand.success") || message.key().equals("advMode.notEnabled") || message.key().equals("advMode.notAllowed")) {
@@ -137,10 +141,10 @@ public class CommandCore implements TickListener, PacketListener {
 	private boolean checkCore(ChunkPos pos) {
 		ChunkColumn chunkColumn = world.getChunk(pos);
 		if (chunkColumn == null) return false;
-		Chunk section = chunkColumn.getData()[0];
+		ChunkSection section = chunkColumn.getChunks()[0];
 		if (section == null) return false;
-		BitStorage storage = section.getStorage();
-		Palette palette = section.getPalette();
+		BitStorage storage = section.getChunkData().getStorage();
+		Palette palette = section.getChunkData().getPalette();
 		for (int i=0; i<256*targetCoreHeight; i++) {
 			if (!isCommandBlock(palette.idToState(storage.get(i)))) {
 				return false;
@@ -157,16 +161,16 @@ public class CommandCore implements TickListener, PacketListener {
 		return checkCore(corePos);
 	}
 	
-	private void fillCore(ChunkPos pos) {
+	private void fillCore(ChunkPos pos, boolean retry) {
 		int x = pos.getX() << 4;
 		int z = pos.getZ() << 4;
-		bot.sendCommand(String.format("/fill %d %d %d %d %d %d repeating_command_block replace", x, 0, z, x+15, targetCoreHeight-1, z+15));
+		bot.sendCommand(String.format("/fill %d %d %d %d %d %d repeating_command_block %s", x, world.getMinY(), z, x+15, world.getMinY()+targetCoreHeight-1, z+15, retry ? "destroy" : "replace"));
 	}
 	
 	private void deleteCore() {
 		int x = corePos.getX() << 4;
 		int z = corePos.getZ() << 4;
-		run(String.format("/fill %d 0 %d %d 15 %d air replace repeating_command_block", x, z, x+15, z+15));
+		run(String.format("/fill %d %d %d %d %d %d air replace repeating_command_block", x, world.getMinY(), z, x+15, world.getMinY()+15, z+15));
 		idx = 0;
 	}
 	
@@ -203,7 +207,7 @@ public class CommandCore implements TickListener, PacketListener {
 		int z = (corePos.getZ() << 4) + ((idx>>4) & 15);
 		int y = idx >> 8;
 		Position p = new Position(x, y, z);
-		bot.sendPacket(new ClientUpdateCommandBlockPacket(p, command, CommandBlockMode.AUTO, false, false, true));
+		bot.sendPacket(new ServerboundSetCommandBlockPacket(p, command, CommandBlockMode.AUTO, false, false, true));
 		idx = (idx+1) % (256*coreHeight);
 		commandLag++;
 	}

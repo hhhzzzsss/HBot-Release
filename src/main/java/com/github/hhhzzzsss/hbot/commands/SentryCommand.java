@@ -1,11 +1,7 @@
 package com.github.hhhzzzsss.hbot.commands;
 
 import com.github.hhhzzzsss.hbot.HBot;
-import com.github.hhhzzzsss.hbot.command.ArgsParser;
-import com.github.hhhzzzsss.hbot.command.ChatCommand;
-import com.github.hhhzzzsss.hbot.command.CommandException;
-import com.github.hhhzzzsss.hbot.command.DiscordCommand;
-import com.github.hhhzzzsss.hbot.command.PlatformInfo;
+import com.github.hhhzzzsss.hbot.command.*;
 import com.github.hhhzzzsss.hbot.entity.EntitySelector;
 import com.github.hhhzzzsss.hbot.processes.Sentry;
 import com.github.hhhzzzsss.hbot.processes.Sentry.AttackType;
@@ -24,8 +20,9 @@ public class SentryCommand implements ChatCommand, DiscordCommand {
 	@Override
 	public String[] getSyntax() {
 		return new String[] {
-			"list - lists attack types",
+			"list",
 			"<entityType> <attackType> [maxTargets]",
+			"stop"
 		};
 	}
 
@@ -40,7 +37,7 @@ public class SentryCommand implements ChatCommand, DiscordCommand {
 	}
 
 	@Override
-	public void executeChat(String sender, String args) throws CommandException {
+	public void executeChat(ChatSender sender, String args) throws CommandException {
 		execute(args, PlatformInfo.getMinecraft(hbot, hbot.getCommandCore()));
 	}
 	
@@ -62,6 +59,15 @@ public class SentryCommand implements ChatCommand, DiscordCommand {
     		}
 			platform.sendMessage(sb.toString());
 		}
+		else if (args.toLowerCase().startsWith("stop")) {
+			if (hbot.getCommandCore().getProcess() instanceof Sentry) {
+				hbot.getCommandCore().getProcess().stop();
+				platform.sendMessage("&7Sentry stopped");
+			}
+			else {
+				platform.sendMessage("&7Sentry is not currently running");
+			}
+		}
 		else {
 			ArgsParser parser = new ArgsParser(this, args);
 			EntitySelector entitySelector = parser.readEntitySelector(true);
@@ -70,7 +76,7 @@ public class SentryCommand implements ChatCommand, DiscordCommand {
 			if (maxTargets == null) maxTargets = 3;
 			if (hbot.getCommandCore().getProcess() == null || hbot.getCommandCore().getProcess() instanceof Sentry) {
 				hbot.getCommandCore().forceSetProcess(new Sentry(hbot, entitySelector, type, maxTargets));
-				hbot.sendChat("&7Enabled sentry");
+				platform.sendMessage("&7Enabled sentry");
 			}
 			else {
 				throw new CommandException("Another process is already running");

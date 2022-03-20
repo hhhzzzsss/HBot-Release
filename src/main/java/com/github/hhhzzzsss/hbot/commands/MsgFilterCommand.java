@@ -37,7 +37,7 @@ public class MsgFilterCommand implements ChatCommand, DiscordCommand {
 	}
 
 	@Override
-	public void executeChat(String sender, String args) throws CommandException {
+	public void executeChat(ChatSender sender, String args) throws CommandException {
 		ArgsParser parser = new ArgsParser(this, args);
 		execute(parser, PlatformInfo.getMinecraft(hbot));
 	}
@@ -45,7 +45,7 @@ public class MsgFilterCommand implements ChatCommand, DiscordCommand {
 	@Override
 	public void executeDiscord(MessageReceivedEvent event, String args) throws CommandException {
 		ArgsParser parser = new ArgsParser(this, args);
-		execute(parser, PlatformInfo.getDiscord(hbot, event, "Player Filter"));
+		execute(parser, PlatformInfo.getDiscord(hbot, event, "Message Filter"));
 	}
 	
 	private void execute(ArgsParser parser, PlatformInfo platform) throws CommandException {

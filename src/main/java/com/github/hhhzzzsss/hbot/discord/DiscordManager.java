@@ -1,28 +1,28 @@
 package com.github.hhhzzzsss.hbot.discord;
 
-import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
-
-import javax.security.auth.login.LoginException;
-
 import com.github.hhhzzzsss.hbot.HBot;
-import com.github.hhhzzzsss.hbot.command.Permission;
 import com.github.hhhzzzsss.hbot.listeners.DisconnectListener;
 import com.github.hhhzzzsss.hbot.listeners.PacketListener;
-import com.github.steveice10.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundLoginPacket;
 import com.github.steveice10.packetlib.event.session.DisconnectedEvent;
 import com.github.steveice10.packetlib.packet.Packet;
-
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.ChunkingFilter;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
+
+import javax.security.auth.login.LoginException;
+import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 public class DiscordManager implements PacketListener, DisconnectListener {
@@ -37,6 +37,8 @@ public class DiscordManager implements PacketListener, DisconnectListener {
 	
 	public void login() {
 		JDABuilder builder = JDABuilder.createDefault(hbot.getBotToken());
+		builder.setChunkingFilter(ChunkingFilter.ALL);
+		builder.setMemberCachePolicy(MemberCachePolicy.ALL);
 		builder.enableIntents(GatewayIntent.GUILD_MEMBERS);
 		builder.setActivity(Activity.playing("Loading..."));
 		listener = new DiscordEventListener(this, hbot);
@@ -106,7 +108,7 @@ public class DiscordManager implements PacketListener, DisconnectListener {
 	
 	@Override
 	public void onPacket(Packet packet) {
-		if (packet instanceof ServerJoinGamePacket) {
+		if (packet instanceof ClientboundLoginPacket) {
 			setConnectedStatus(true);
 		}
 	}

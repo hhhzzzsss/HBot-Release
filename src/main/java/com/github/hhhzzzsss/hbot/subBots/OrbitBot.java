@@ -1,16 +1,15 @@
 package com.github.hhhzzzsss.hbot.subBots;
 
-import java.util.UUID;
-
 import com.github.hhhzzzsss.hbot.Bot;
 import com.github.hhhzzzsss.hbot.entity.EntityTracker;
 import com.github.hhhzzzsss.hbot.entity.PlayerEntity;
 import com.github.hhhzzzsss.hbot.util.ChatUtils;
-import com.github.steveice10.mc.protocol.packet.ingame.server.ServerChatPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundChatPacket;
 import com.github.steveice10.packetlib.event.session.DisconnectedEvent;
 import com.github.steveice10.packetlib.packet.Packet;
+import lombok.Getter;
 
-import lombok.*;
+import java.util.UUID;
 
 public class OrbitBot extends Bot {
 	@Getter Bot parent;
@@ -103,8 +102,8 @@ public class OrbitBot extends Bot {
 	
 	@Override
 	protected void onPacket(Packet packet) {
-		if (packet instanceof ServerChatPacket) {
-			ServerChatPacket t_packet = (ServerChatPacket) packet;
+		if (packet instanceof ClientboundChatPacket) {
+			ClientboundChatPacket t_packet = (ClientboundChatPacket) packet;
 			String text = ChatUtils.getFullText(t_packet.getMessage());
 			if (text.equals("Error: Player not found.") || text.equals("Error: null.")) {
 				sendChatInstantly("Could not teleport to target. Disconnecting...");

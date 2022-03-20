@@ -2,15 +2,13 @@ package com.github.hhhzzzsss.hbot.commands;
 
 import com.github.hhhzzzsss.hbot.Bot;
 import com.github.hhhzzzsss.hbot.Main;
-import com.github.hhhzzzsss.hbot.command.ChatCommand;
-import com.github.hhhzzzsss.hbot.command.CommandException;
-import com.github.hhhzzzsss.hbot.command.DiscordCommand;
+import com.github.hhhzzzsss.hbot.command.*;
 
 import lombok.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 @RequiredArgsConstructor
-public class RestartCommand implements ChatCommand, DiscordCommand {
+public class RestartCommand implements ChatCommand, GlobalDiscordCommand {
 	private final Bot bot;
 
 	@Override
@@ -34,7 +32,7 @@ public class RestartCommand implements ChatCommand, DiscordCommand {
 	}
 
 	@Override
-	public void executeChat(String sender, String args) throws CommandException {
+	public void executeChat(ChatSender sender, String args) throws CommandException {
 		bot.sendChatInstantly("Restarting...");
 		new Thread(() -> {
 			Main.restart();

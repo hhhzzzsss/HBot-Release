@@ -7,7 +7,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		for (Config.BotInfo botInfo : Config.getConfig().getBots()) {
-			HBot hbot = new HBot(botInfo.getHost(), botInfo.getPort(), botInfo.getServerNick(), botInfo.getDiscordToken(), botInfo.getCategoryName());
+			HBot hbot = new HBot(botInfo);
 			hbots.add(hbot);
 		}
 		for (HBot hbot : hbots) {

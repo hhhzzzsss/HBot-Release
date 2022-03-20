@@ -9,23 +9,16 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 import com.github.hhhzzzsss.hbot.HBot;
 import com.github.hhhzzzsss.hbot.Logger;
-import com.github.hhhzzzsss.hbot.command.ArgsParser;
-import com.github.hhhzzzsss.hbot.command.ChatCommand;
-import com.github.hhhzzzsss.hbot.command.CommandException;
-import com.github.hhhzzzsss.hbot.command.DiscordCommand;
-import com.github.hhhzzzsss.hbot.command.PlatformInfo;
+import com.github.hhhzzzsss.hbot.command.*;
 import com.github.hhhzzzsss.hbot.discord.DiscordUtils;
 
 import lombok.*;
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -62,7 +55,7 @@ public class LogQueryCommand implements ChatCommand, DiscordCommand {
 	}
 
 	@Override
-	public void executeChat(String sender, String args) throws CommandException {
+	public void executeChat(ChatSender sender, String args) throws CommandException {
 		execute(args, PlatformInfo.getMinecraft(hbot, hbot.getCommandCore()));
 	}
 	
@@ -236,7 +229,7 @@ public class LogQueryCommand implements ChatCommand, DiscordCommand {
 					}
 				}
 				// Check if there's a '[x' on the left side
-				if (idx != line.length()-2 && idx > 0 && line.charAt(idx) == 'x' && line.charAt(idx-1) == '[') {
+				if (idx < line.length()-2 && idx > 0 && line.charAt(idx) == 'x' && line.charAt(idx-1) == '[') {
 					repetitions = Integer.parseInt(line.substring(idx+1, line.length()-1));
 					line = line.substring(0, idx-1);
 				}

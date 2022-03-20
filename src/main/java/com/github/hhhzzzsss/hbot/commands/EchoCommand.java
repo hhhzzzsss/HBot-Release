@@ -1,10 +1,7 @@
 package com.github.hhhzzzsss.hbot.commands;
 
 import com.github.hhhzzzsss.hbot.Bot;
-import com.github.hhhzzzsss.hbot.command.ArgsParser;
-import com.github.hhhzzzsss.hbot.command.ChatCommand;
-import com.github.hhhzzzsss.hbot.command.CommandException;
-import com.github.hhhzzzsss.hbot.command.DiscordCommand;
+import com.github.hhhzzzsss.hbot.command.*;
 import com.github.hhhzzzsss.hbot.discord.DiscordUtils;
 
 import lombok.*;
@@ -35,7 +32,7 @@ public class EchoCommand implements ChatCommand, DiscordCommand {
 	}
 
 	@Override
-	public void executeChat(String sender, String args) throws CommandException {
+	public void executeChat(ChatSender sender, String args) throws CommandException {
 		ArgsParser parser = new ArgsParser(this, args);
 		bot.sendChat(parser.readString(true));
 	}

@@ -4,7 +4,7 @@ This file will explain what the different resources are and where they come from
 ## mapColors.json
 Map color data contains the colors of various blocks when they appear on maps. Currently, the data I've pulled contains a block for every color except for the color corresponding to water.
 
-The map color data is taken from [MapartCraft](https://rebane2001.com/mapartcraft/). The data for the selected blocks is pulled into a json file with the following script:
+The map color data is taken from [MapartCraft](https://rebane2001.com/mapartcraft/). The data for the selected blocks used to be pulled into a json file with the following script:
 
 ```javascript
 function download(filename, text) {
@@ -34,6 +34,8 @@ mapdata.push({
 
 download ('mapColors.json', JSON.stringify(mapdata, null, 2));
 ```
+
+But ever since they rewrote their site in react, it became impossible to extract the json from the Javascript console, so I wrote a new program that can extract it from their coloursJSON.json file here: [https://github.com/hhhzzzsss/MapartCraftPresetExtractor](https://github.com/hhhzzzsss/MapartCraftPresetExtractor).
 
 ## blocks.json, entities.json, language.json
 These files are from [https://github.com/PrismarineJS/minecraft-data](https://github.com/PrismarineJS/minecraft-data).

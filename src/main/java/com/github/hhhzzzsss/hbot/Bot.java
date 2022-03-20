@@ -1,33 +1,32 @@
 package com.github.hhhzzzsss.hbot;
 
+import com.github.hhhzzzsss.hbot.listeners.DisconnectListener;
+import com.github.hhhzzzsss.hbot.listeners.PacketListener;
+import com.github.hhhzzzsss.hbot.listeners.TickListener;
+import com.github.hhhzzzsss.hbot.modules.ChatQueue;
+import com.github.hhhzzzsss.hbot.modules.PositionManager;
+import com.github.hhhzzzsss.hbot.modules.StateManager;
+import com.github.hhhzzzsss.hbot.util.HashUtils;
+import com.github.steveice10.mc.protocol.MinecraftProtocol;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundLoginPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.serverbound.ServerboundChatPacket;
+import com.github.steveice10.packetlib.ProxyInfo;
+import com.github.steveice10.packetlib.Session;
+import com.github.steveice10.packetlib.event.session.DisconnectedEvent;
+import com.github.steveice10.packetlib.event.session.SessionAdapter;
+import com.github.steveice10.packetlib.packet.Packet;
+import com.github.steveice10.packetlib.tcp.TcpClientSession;
+import io.netty.util.concurrent.FastThreadLocal;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import com.github.hhhzzzsss.hbot.listeners.*;
-import com.github.hhhzzzsss.hbot.modules.*;
-import com.github.hhhzzzsss.hbot.util.HashUtils;
-import com.github.steveice10.mc.protocol.MinecraftProtocol;
-import com.github.steveice10.mc.protocol.packet.ingame.client.ClientChatPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
-import com.github.steveice10.packetlib.ProxyInfo;
-import com.github.steveice10.packetlib.Session;
-import com.github.steveice10.packetlib.event.session.DisconnectedEvent;
-import com.github.steveice10.packetlib.event.session.PacketReceivedEvent;
-import com.github.steveice10.packetlib.event.session.SessionAdapter;
-import com.github.steveice10.packetlib.packet.Packet;
-
-import com.github.steveice10.packetlib.tcp.TcpClientSession;
-import io.netty.util.concurrent.FastThreadLocal;
-import lombok.*;
 
 public abstract class Bot {
 	public static final ArrayList<Bot> BOTLIST = new ArrayList<>();
@@ -77,8 +76,8 @@ public abstract class Bot {
 		session = new TcpClientSession(host, port, protocol, PROXY);
 		session.addListener(new SessionAdapter() {
 			@Override
-            public synchronized void packetReceived(PacketReceivedEvent event) {
-				packetQueue.add(event.getPacket());
+            public synchronized void packetReceived(Session session, Packet packet) {
+				packetQueue.add(packet);
 			}
 			
 			@Override
@@ -181,7 +180,7 @@ public abstract class Bot {
 	
 	public List<PacketFuture> packetFutures = new LinkedList<>();
 	private void processPacket(Packet packet) {
-		if (packet instanceof ServerJoinGamePacket) {
+		if (packet instanceof ClientboundLoginPacket) {
 			loggedIn = true;
 		}
 		
@@ -287,7 +286,7 @@ public abstract class Bot {
 	}
 	
 	public void sendChatInstantly(String chat) {
-		sendPacket(new ClientChatPacket(chat));
+		sendPacket(new ServerboundChatPacket(chat));
 	}
 	
 	public void stop() {

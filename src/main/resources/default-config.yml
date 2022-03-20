@@ -4,6 +4,7 @@ bots:
     serverNick: "Kaboom"
     discordToken: "Discord bot token goes here"
     categoryName: "Main Kaboom Channels"
+    isDefault: true
 
 trustedKey: ""
 adminKey: ""

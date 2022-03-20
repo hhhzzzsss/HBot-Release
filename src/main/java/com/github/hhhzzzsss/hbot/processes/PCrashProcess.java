@@ -19,6 +19,7 @@ public class PCrashProcess extends CoreProcess {
 	
 	@Override
 	public void onTick() {
-		hbot.getCommandCore().run(String.format("particle minecraft:dust 1 0 0 9 %f %f %f 0 0 0 0 2147483646 force", x, y, z));
+		hbot.getCommandCore().run(String.format("particle minecraft:dust_color_transition 1 0 0 2 0 1 0 %f %f %f 0.1 0.1 0.1 0 2147483646 force @a", x, y, z));
+		//hbot.getCommandCore().run(String.format("particle minecraft:dust 1 0 0 9 %f %f %f 0 0 0 0 2147483646 force", x, y, z));
 	}
 }

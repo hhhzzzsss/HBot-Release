@@ -4,11 +4,7 @@ import java.io.File;
 import java.util.Queue;
 
 import com.github.hhhzzzsss.hbot.HBot;
-import com.github.hhhzzzsss.hbot.command.ArgsParser;
-import com.github.hhhzzzsss.hbot.command.ChatCommand;
-import com.github.hhhzzzsss.hbot.command.CommandException;
-import com.github.hhhzzzsss.hbot.command.DiscordCommand;
-import com.github.hhhzzzsss.hbot.command.PlatformInfo;
+import com.github.hhhzzzsss.hbot.command.*;
 import com.github.hhhzzzsss.hbot.modules.music.MusicPlayer;
 import com.github.hhhzzzsss.hbot.modules.music.Song;
 import com.github.hhhzzzsss.hbot.modules.music.SongLoaderThread;
@@ -48,7 +44,7 @@ public class MusicCommand implements ChatCommand, DiscordCommand {
 	}
 
 	@Override
-	public void executeChat(String sender, String args) throws CommandException {
+	public void executeChat(ChatSender sender, String args) throws CommandException {
 		execute(args, PlatformInfo.getMinecraft(hbot, hbot.getCommandCore()));
 	}
 	

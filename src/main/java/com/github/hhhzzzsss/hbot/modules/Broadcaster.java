@@ -1,16 +1,17 @@
 package com.github.hhhzzzsss.hbot.modules;
 
-import java.util.ArrayList;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
 import com.github.hhhzzzsss.hbot.Bot;
 import com.github.hhhzzzsss.hbot.listeners.PacketListener;
 import com.github.hhhzzzsss.hbot.listeners.TickListener;
-import com.github.steveice10.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundLoginPacket;
 import com.github.steveice10.packetlib.packet.Packet;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
-import lombok.*;
+import java.util.ArrayList;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 public class Broadcaster implements PacketListener, TickListener {
@@ -22,7 +23,7 @@ public class Broadcaster implements PacketListener, TickListener {
 	private ArrayList<String> broadcasts = new ArrayList<>();
 	
 	public void onPacket(Packet packet) {
-		if (packet instanceof ServerJoinGamePacket && loginMessage != null) {
+		if (packet instanceof ClientboundLoginPacket && loginMessage != null) {
 			bot.sendChat(loginMessage);
 		}
 	}

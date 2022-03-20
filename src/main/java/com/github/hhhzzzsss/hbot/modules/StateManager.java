@@ -1,27 +1,29 @@
 package com.github.hhhzzzsss.hbot.modules;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.github.hhhzzzsss.hbot.Bot;
 import com.github.hhhzzzsss.hbot.listeners.DisconnectListener;
 import com.github.hhhzzzsss.hbot.listeners.PacketListener;
 import com.github.hhhzzzsss.hbot.listeners.TickListener;
 import com.github.hhhzzzsss.hbot.util.ChatUtils;
-import com.github.steveice10.mc.protocol.data.game.entity.EntityStatus;
+import com.github.steveice10.mc.protocol.data.game.entity.EntityEvent;
 import com.github.steveice10.mc.protocol.data.game.entity.player.GameMode;
-import com.github.steveice10.mc.protocol.data.game.world.notify.ClientNotification;
-import com.github.steveice10.mc.protocol.packet.ingame.server.ServerChatPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.ServerRespawnPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityStatusPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.world.ServerNotifyClientPacket;
+import com.github.steveice10.mc.protocol.data.game.level.notify.GameEvent;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundChatPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundLoginPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundRespawnPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.entity.ClientboundEntityEventPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.level.ClientboundGameEventPacket;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.packetlib.event.session.DisconnectedEvent;
 import com.github.steveice10.packetlib.packet.Packet;
-
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import net.kyori.adventure.text.Component;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson;
 
 @RequiredArgsConstructor
@@ -68,8 +70,8 @@ public class StateManager implements PacketListener, TickListener, DisconnectLis
 	
 	@Override
 	public void onPacket(Packet packet) {
-		if (packet instanceof ServerChatPacket) {
-			ServerChatPacket t_packet = (ServerChatPacket) packet;
+		if (packet instanceof ClientboundChatPacket) {
+			ClientboundChatPacket t_packet = (ClientboundChatPacket) packet;
 			
 			Component message = t_packet.getMessage();
 			String jsonMessage = gson().serialize(message);
@@ -141,31 +143,31 @@ public class StateManager implements PacketListener, TickListener, DisconnectLis
             	wrongPrefix = false;
             }
 		}
-		else if (packet instanceof ServerNotifyClientPacket) {
-        	ServerNotifyClientPacket t_packet = (ServerNotifyClientPacket) packet;
-        	if (t_packet.getNotification() == ClientNotification.CHANGE_GAMEMODE) {
+		else if (packet instanceof ClientboundGameEventPacket) {
+			ClientboundGameEventPacket t_packet = (ClientboundGameEventPacket) packet;
+        	if (t_packet.getNotification() == GameEvent.CHANGE_GAMEMODE) {
         		gamemode = (GameMode) t_packet.getValue();
         	}
         }
-		else if (packet instanceof ServerJoinGamePacket) {
-			ServerJoinGamePacket t_packet = (ServerJoinGamePacket) packet;
+		else if (packet instanceof ClientboundLoginPacket) {
+			ClientboundLoginPacket t_packet = (ClientboundLoginPacket) packet;
 			entityId = t_packet.getEntityId();
 			gamemode = t_packet.getGameMode();
 			dimension = ((StringTag)t_packet.getDimension().get("effects")).getValue();
 		}
-		else if (packet instanceof ServerEntityStatusPacket) {
-			ServerEntityStatusPacket t_packet = (ServerEntityStatusPacket) packet;
+		else if (packet instanceof ClientboundEntityEventPacket) {
+			ClientboundEntityEventPacket t_packet = (ClientboundEntityEventPacket) packet;
 			if (t_packet.getEntityId() == entityId) {
-				if (t_packet.getStatus() == EntityStatus.PLAYER_OP_PERMISSION_LEVEL_0) {
+				if (t_packet.getStatus() == EntityEvent.PLAYER_OP_PERMISSION_LEVEL_0) {
 					opped = false;
 				}
-				else if (t_packet.getStatus() == EntityStatus.PLAYER_OP_PERMISSION_LEVEL_4) {
+				else if (t_packet.getStatus() == EntityEvent.PLAYER_OP_PERMISSION_LEVEL_4) {
 					opped = true;
 				}
 			}
 		}
-		else if (packet instanceof ServerRespawnPacket) {
-			ServerRespawnPacket t_packet = (ServerRespawnPacket) packet;
+		else if (packet instanceof ClientboundRespawnPacket) {
+			ClientboundRespawnPacket t_packet = (ClientboundRespawnPacket) packet;
 			gamemode = t_packet.getGamemode();
 			dimension = ((StringTag)t_packet.getDimension().get("effects")).getValue();
 		}

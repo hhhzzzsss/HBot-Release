@@ -5,13 +5,13 @@ import com.github.hhhzzzsss.hbot.listeners.DisconnectListener;
 import com.github.hhhzzzsss.hbot.listeners.PacketListener;
 import com.github.steveice10.mc.protocol.data.MagicValues;
 import com.github.steveice10.mc.protocol.data.game.entity.player.PositionElement;
-import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerPositionRotationPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.client.world.ClientTeleportConfirmPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.entity.player.ClientboundPlayerPositionPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.serverbound.level.ServerboundAcceptTeleportationPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.serverbound.player.ServerboundMovePlayerPosRotPacket;
 import com.github.steveice10.packetlib.event.session.DisconnectedEvent;
 import com.github.steveice10.packetlib.packet.Packet;
-
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class PositionManager implements PacketListener, DisconnectListener {
@@ -27,7 +27,7 @@ public class PositionManager implements PacketListener, DisconnectListener {
 		this.x = x;
 		this.y = y;
 		this.z = z;
-		bot.sendPacket(new ClientPlayerPositionRotationPacket(true, x, y, z, yaw, pitch));
+		bot.sendPacket(new ServerboundMovePlayerPosRotPacket(true, x, y, z, yaw, pitch));
 	}
 	
 	public void moveLook(double x, double y, double z, float yaw, float pitch) {
@@ -36,19 +36,19 @@ public class PositionManager implements PacketListener, DisconnectListener {
 		this.z = z;
 		this.yaw = yaw;
 		this.pitch = pitch;
-		bot.sendPacket(new ClientPlayerPositionRotationPacket(true, x, y, z, this.yaw, this.pitch));
+		bot.sendPacket(new ServerboundMovePlayerPosRotPacket(true, x, y, z, this.yaw, this.pitch));
 	}
 	
 	public void look(float yaw, float pitch) {
 		this.yaw = yaw;
 		this.pitch = pitch;
-		bot.sendPacket(new ClientPlayerPositionRotationPacket(true, x, y, z, this.yaw, this.pitch));
+		bot.sendPacket(new ServerboundMovePlayerPosRotPacket(true, x, y, z, this.yaw, this.pitch));
 	}
 
 	@Override
 	public void onPacket(Packet packet) {
-		if (packet instanceof ServerPlayerPositionRotationPacket) {
-			ServerPlayerPositionRotationPacket t_packet = (ServerPlayerPositionRotationPacket) packet;
+		if (packet instanceof ClientboundPlayerPositionPacket) {
+			ClientboundPlayerPositionPacket t_packet = (ClientboundPlayerPositionPacket) packet;
 			boolean[] relFlags = new boolean[5];
 			for (PositionElement element : t_packet.getRelative()) {
 				relFlags[MagicValues.value(Integer.class, element)] = true;
@@ -58,7 +58,7 @@ public class PositionManager implements PacketListener, DisconnectListener {
         	z = relFlags[2] ? z+t_packet.getZ() : t_packet.getZ();
         	yaw = relFlags[3] ? yaw+t_packet.getYaw() : t_packet.getYaw();
         	pitch = relFlags[4] ? pitch+t_packet.getPitch() : t_packet.getPitch();
-        	bot.sendPacket(new ClientTeleportConfirmPacket(t_packet.getTeleportId()));
+        	bot.sendPacket(new ServerboundAcceptTeleportationPacket(t_packet.getTeleportId()));
         	spawned = true;
         }
 	}

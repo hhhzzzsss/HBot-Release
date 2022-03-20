@@ -1,20 +1,13 @@
 package com.github.hhhzzzsss.hbot.entity;
 
-import java.util.UUID;
-
 import com.github.hhhzzzsss.hbot.util.EntityUtils;
 import com.github.hhhzzzsss.hbot.util.EntityUtils.EntityData;
 import com.github.steveice10.mc.protocol.data.game.entity.type.EntityType;
-import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityHeadLookPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityPositionPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityPositionRotationPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityRotationPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityStatusPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityTeleportPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityVelocityPacket;
-import com.github.steveice10.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnEntityPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.entity.*;
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.entity.spawn.ClientboundAddEntityPacket;
+import lombok.Getter;
 
-import lombok.*;
+import java.util.UUID;
 
 @Getter
 public class Entity implements Comparable<Entity> {
@@ -35,7 +28,7 @@ public class Entity implements Comparable<Entity> {
 	
 	protected Entity() {}
 	
-	public Entity(ServerSpawnEntityPacket p) {
+	public Entity(ClientboundAddEntityPacket p) {
 		eid = p.getEntityId();
 		uuid = p.getUuid();
 		type = p.getType();
@@ -49,14 +42,14 @@ public class Entity implements Comparable<Entity> {
 		zVel = p.getMotionZ();
 	}
 	
-	public void update(ServerEntityPositionPacket p) {
+	public void update(ClientboundMoveEntityPosPacket p) {
 		x += p.getMoveX();
 		y += p.getMoveY();
 		z += p.getMoveZ();
 		onGround = p.isOnGround();
 	}
 	
-	public void update(ServerEntityPositionRotationPacket p) {
+	public void update(ClientboundMoveEntityPosRotPacket p) {
 		x += p.getMoveX();
 		y += p.getMoveY();
 		z += p.getMoveZ();
@@ -65,15 +58,15 @@ public class Entity implements Comparable<Entity> {
 		onGround = p.isOnGround();
 	}
 	
-	public void update(ServerEntityRotationPacket p) {
+	public void update(ClientboundMoveEntityRotPacket p) {
 		yaw = p.getYaw();
 		pitch = p.getPitch();
 		onGround = p.isOnGround();
 	}
 	
-	public void update(ServerEntityHeadLookPacket p) {}
+	public void update(ClientboundRotateHeadPacket p) {}
 	
-	public void update(ServerEntityTeleportPacket p) {
+	public void update(ClientboundTeleportEntityPacket p) {
 		x = p.getX();
 		y = p.getY();
 		z = p.getZ();
@@ -82,13 +75,13 @@ public class Entity implements Comparable<Entity> {
 		onGround = p.isOnGround();
 	}
 	
-	public void update(ServerEntityVelocityPacket p) {
+	public void update(ClientboundSetEntityMotionPacket p) {
 		xVel = p.getMotionX();
 		yVel = p.getMotionY();
 		zVel = p.getMotionZ();
 	}
 	
-	public void update(ServerEntityStatusPacket p) {}
+	public void update(ClientboundEntityEventPacket p) {}
 	
 	@Override
 	public int compareTo(Entity other) {

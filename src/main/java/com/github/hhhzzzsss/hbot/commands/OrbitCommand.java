@@ -4,9 +4,8 @@ import java.util.UUID;
 
 import com.github.hhhzzzsss.hbot.HBot;
 import com.github.hhhzzzsss.hbot.command.ChatCommand;
+import com.github.hhhzzzsss.hbot.command.ChatSender;
 import com.github.hhhzzzsss.hbot.command.CommandException;
-import com.github.hhhzzzsss.hbot.entity.PlayerData;
-import com.github.hhhzzzsss.hbot.subBots.OrbitBot;
 
 import lombok.*;
 
@@ -36,12 +35,12 @@ public class OrbitCommand implements ChatCommand {
 
 	@Getter @Setter private int maxBots = 3;
 	@Override
-	public void executeChat(String sender, String args) throws CommandException {
-		UUID uuid = hbot.getPlayerListTracker().getRecordedUUID(sender);
+	public void executeChat(ChatSender sender, String args) throws CommandException {
+		UUID uuid = hbot.getPlayerListTracker().getRecordedUUID(sender.getName());
 		if (uuid == null || !hbot.getPlayerListTracker().getPlayerList().containsKey(uuid)) {
-			throw new CommandException("Could not find player " + sender);
+			throw new CommandException("Could not find player " + sender.getName());
 		}
-		hbot.getOrbitManager().createOrbit(hbot, sender, uuid);
-		hbot.sendChat("&7Creating a bot orbiting &3" + sender);
+		hbot.getOrbitManager().createOrbit(hbot, sender.getName(), uuid);
+		hbot.sendChat("&7Creating a bot orbiting &3" + sender.getName());
 	}
 }

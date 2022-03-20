@@ -1,19 +1,9 @@
 package com.github.hhhzzzsss.hbot.commands;
 
-import java.awt.Color;
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.List;
 
 import com.github.hhhzzzsss.hbot.HBot;
-import com.github.hhhzzzsss.hbot.command.ArgsParser;
-import com.github.hhhzzzsss.hbot.command.ChatCommand;
-import com.github.hhhzzzsss.hbot.command.CommandException;
-import com.github.hhhzzzsss.hbot.command.DiscordCommand;
-import com.github.hhhzzzsss.hbot.command.PlatformInfo;
-import com.github.hhhzzzsss.hbot.processes.SchemProcess;
-import com.github.hhhzzzsss.hbot.processes.mapart.MapartLoaderThread;
+import com.github.hhhzzzsss.hbot.command.*;
 import com.github.hhhzzzsss.hbot.processes.mapart.MapartProcess;
 
 import lombok.*;
@@ -46,7 +36,7 @@ public class MapartCommand implements ChatCommand, DiscordCommand {
 	}
 
 	@Override
-	public void executeChat(String sender, String args) throws CommandException {
+	public void executeChat(ChatSender sender, String args) throws CommandException {
 		ArgsParser parser = new ArgsParser(this, args);
 		execute(parser, PlatformInfo.getMinecraft(hbot));
 	}
