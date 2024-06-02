@@ -1,7 +1,7 @@
 # HBot-Release
 Source code release for HBot. To be used as a reference.
 
-While this repository contains a large majority of HBot's source code, certain features and classes were removed at my own discretion, including HBot.java, which is needed for the bot to work, to make discourage people from making exact copies of HBot.
+While this repository contains a large majority of HBot's source code, certain features and classes were removed at my discretion, including HBot.java, which is needed for the bot to work. This is to discourage people from making exact copies of HBot.
 
 **This is not meant to be a fully-functioning version. It will not compile.**
 
